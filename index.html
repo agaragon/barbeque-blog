@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smokin' Good BBQ Blog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+            min-height: 100vh;
+            color: #2C1810;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #8B4513;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 1.3em;
+            color: #D2691E;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .fire-emoji {
+            font-size: 2em;
+            animation: flicker 2s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .posts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .post-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: #D2691E;
+        }
+
+        .post-title {
+            font-size: 1.8em;
+            color: #8B4513;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .post-excerpt {
+            color: #5D4037;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #8D6E63;
+            border-top: 1px solid #E0E0E0;
+            padding-top: 15px;
+        }
+
+        .read-more {
+            background: linear-gradient(45deg, #D2691E, #FF8C00);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .read-more:hover {
+            background: linear-gradient(45deg, #FF8C00, #FFB347);
+            transform: scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.5em;
+            color: white;
+            margin: 50px 0;
+        }
+
+        .no-posts {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            color: #8B4513;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #FFB347;
+        }
+
+        .modal-body {
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .logo {
+                font-size: 2.5em;
+            }
+            
+            .posts-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🔥 Smokin' Good BBQ 🔥</div>
+            <div class="tagline">Where every bite tells a story</div>
+            <div class="fire-emoji">🔥🍖🔥</div>
+        </header>
+
+        <div class="loading" id="loading">Loading delicious content... 🍖</div>
+        
+        <div class="posts-container" id="postsContainer" style="display: none;">
+            <!-- Posts will be dynamically loaded here -->
+        </div>
+
+        <div class="no-posts" id="noPosts" style="display: none;">
+            <h2>🍖 No posts yet!</h2>
+            <p>Add some HTML files to the 'posts' folder to get started.</p>
+        </div>
+    </div>
+
+    <!-- Modal for displaying full posts -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Post Title</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Post content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BBQBlog {
+            constructor() {
+                this.posts = [];
+                this.postsContainer = document.getElementById('postsContainer');
+                this.loading = document.getElementById('loading');
+                this.noPosts = document.getElementById('noPosts');
+                this.modal = document.getElementById('postModal');
+                this.modalTitle = document.getElementById('modalTitle');
+                this.modalBody = document.getElementById('modalBody');
+                
+                this.init();
+            }
+
+            async init() {
+                await this.loadPosts();
+                this.renderPosts();
+                this.setupModal();
+            }
+
+            async loadPosts() {
+                // List of potential post files - in a real scenario, you'd get this from a server
+                // For demo purposes, we'll try to load a few common post files
+                const potentialPosts = [
+                    'bbq_post_brisket.html',
+                    'bbq_post_pulled_pork.html',
+                    'bbq_post_ribs.html',
+                    'bbq_post_sauces.html',
+                    'bbq_post_smoker.html',
+                ];
+
+                for (const postFile of potentialPosts) {
+                    try {
+                        const response = await fetch(`posts/${postFile}`);
+                        if (response.ok) {
+                            const content = await response.text();
+                            const postData = this.parsePost(content, postFile);
+                            if (postData) {
+                                this.posts.push(postData);
+                            }
+                        }
+                    } catch (error) {
+                        console.log(`Could not load ${postFile}`);
+                    }
+                }
+
+                // Sort posts by date (newest first)
+                this.posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+            }
+
+            parsePost(content, filename) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(content, 'text/html');
+                
+                // Extract metadata from the post
+                const titleElement = doc.querySelector('h1, .post-title, title');
+                const excerptElement = doc.querySelector('.excerpt, .summary, p');
+                const dateElement = doc.querySelector('.date, .post-date');
+                const authorElement = doc.querySelector('.author, .post-author');
+
+                const title = titleElement ? titleElement.textContent.trim() : filename.replace('.html', '').replace(/-/g, ' ');
+                const excerpt = excerptElement ? excerptElement.textContent.trim().substring(0, 150) + '...' : 'No excerpt available.';
+                const date = dateElement ? dateElement.textContent.trim() : new Date().toLocaleDateString();
+                const author = authorElement ? authorElement.textContent.trim() : 'BBQ Master';
+
+                return {
+                    filename,
+                    title,
+                    excerpt,
+                    date,
+                    author,
+                    content
+                };
+            }
+
+            renderPosts() {
+                this.loading.style.display = 'none';
+                
+                if (this.posts.length === 0) {
+                    this.noPosts.style.display = 'block';
+                    return;
+                }
+
+                this.postsContainer.style.display = 'grid';
+                
+                this.posts.forEach(post => {
+                    const postCard = this.createPostCard(post);
+                    this.postsContainer.appendChild(postCard);
+                });
+            }
+
+            createPostCard(post) {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.innerHTML = `
+                    <div class="post-title">${post.title}</div>
+                    <div class="post-excerpt">${post.excerpt}</div>
+                    <div class="post-meta">
+                        <span>By ${post.author} • ${post.date}</span>
+                        <button class="read-more">Read More 🍖</button>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => this.openPost(post));
+                return card;
+            }
+
+            openPost(post) {
+                this.modalTitle.textContent = post.title;
+                this.modalBody.innerHTML = post.content;
+                this.modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            setupModal() {
+                const closeBtn = document.querySelector('.close');
+                
+                closeBtn.addEventListener('click', () => this.closeModal());
+                
+                window.addEventListener('click', (event) => {
+                    if (event.target === this.modal) {
+                        this.closeModal();
+                    }
+                });
+
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        this.closeModal();
+                    }
+                });
+            }
+
+            closeModal() {
+                this.modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Initialize the blog when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new BBQBlog();
+        });
+    </script>
+</body>
+</html>
