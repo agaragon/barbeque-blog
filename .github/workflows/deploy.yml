@@ -22,4 +22,4 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 sync . s3://${{ secrets.S3_BUCKET }} --delete
+          aws s3 sync ./app s3://${{ secrets.S3_BUCKET }} --delete
