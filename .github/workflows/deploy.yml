@@ -20,6 +20,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
           aws-region: us-east-1 # You can change this to your preferred region
 
+      - name: Generate posts.txt
+        run: |
+          # Create posts.txt in the app directory
+          ls -1 app/posts/*.html | xargs -n1 basename > app/posts.txt
+          # Verify the file was created
+          cat app/posts.txt
+
       - name: Deploy to S3
         run: |
           aws s3 sync ./app s3://${{ secrets.S3_BUCKET }} --delete
